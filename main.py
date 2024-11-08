@@ -17,7 +17,8 @@ def check_id(event):
         r = requests.get(f'http://127.0.0.1:8000/{str(device_num)}/{MainInput.get()}')
         ResultMsg.configure(text=r.json()['message'])
     except requests.exceptions.RequestException as e:
-        ResultMsg.configure(text=f"Error: {e}")
+        print(f"Error: {e}")
+        ResultMsg.configure(text="網路錯誤")
     MainInput.delete(0, len(MainInput.get()))
 
 
