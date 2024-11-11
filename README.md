@@ -1,4 +1,4 @@
-# reservation-gui
+# reservation GUI
 
 
 
