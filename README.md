@@ -1,19 +1,29 @@
 # Reservation System GUI
 
-## Prerequisites
+## Prerequisites (For both Development and Production)
 1. If running on Linux, please run the below command before creating a virtual environment
+### Ubuntu/Debian/RPi OS
 ```bash
-sudo apt-get install python3-tk
+sudo apt-get install python3-tk python3-venv
+```
+### Fedora
+```bash
+sudo dnf install python-tkinter
 ```
 2. Create a virtual environment using the requirements.txt in this repo
+``` bash
+python3 -m .venv venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
 
-## Run
+## Development
 ```bash
 python3 -m main
 ```
 
-## Build
+## Build/Production
 ```bash
 python3 -m build
 ```
