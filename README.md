@@ -17,6 +17,7 @@ python3 -m main
 ```bash
 python3 -m build
 ```
+And the executable would be in dist/main folder as "main.exe" or just "main" on Linux
 
 ## Authors and acknowledgment
 Johnny (Lost) - jmlin0101@gmail.com
