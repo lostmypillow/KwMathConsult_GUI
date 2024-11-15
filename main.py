@@ -50,8 +50,8 @@ class App(customtkinter.CTk):
             print(f"code entered: {self.input.get()}")
             r = requests.get(combined_url, timeout=5)
             r.raise_for_status()
-            self.result_msg.configure(
-                text=r.json().get('message', 'No message received'))
+            print(r.text)
+            self.result_msg.configure(text=r.text)
         except Exception as e:
             print(f"Error: {e}")
             self.result_msg.configure(text="網路錯誤")
