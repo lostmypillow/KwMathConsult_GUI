@@ -47,6 +47,7 @@ class App(customtkinter.CTk):
     def check_id(self, event):
         try:
             combined_url = f'{str(config["API_URL"])}/{str(config["DEVICE_NUM"])}/{self.input.get()}'
+            print(f"code entered: {self.input.get()}")
             r = requests.get(combined_url, timeout=5)
             r.raise_for_status()
             self.result_msg.configure(
