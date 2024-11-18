@@ -4,14 +4,9 @@ from dotenv import dotenv_values
 
 config = dotenv_values(".env")
 
-
-class App(customtkinter.CTk):
-    def __init__(self, fg_color=None, **kwargs):
-        super().__init__(fg_color, **kwargs)
-        self.title("Reservation")
-        self.geometry("640x360")
-        self.grid_columnconfigure(0, weight=1)
-
+class InputFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
         self.input = customtkinter.CTkEntry(
             self,
             height=90,
@@ -20,15 +15,43 @@ class App(customtkinter.CTk):
             placeholder_text="請刷卡"
         )
         self.input.grid(
-            row=1,
+            row=0,
+            column=0,
+            padx=20,
+            pady=20,
+            sticky="nsw"
+        )
+        self.input.bind("<Return>", self.check_id)
+        self.input.focus_set()
+        self.btn = customtkinter.CTkButton(self, text="yo")
+        self.btn.grid(
+            row = 0,
+            column = 0,
+            padx=20,
+            pady=20,
+            sticky="nse"
+        )
+
+
+
+class App(customtkinter.CTk):
+    def __init__(self, fg_color=None, **kwargs):
+        super().__init__(fg_color, **kwargs)
+        self.title("Reservation")
+        self.geometry("800x480")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.input_frame  = InputFrame(self)
+        self.input_frame.grid(
+            row=0,
             column=0,
             padx=20,
             pady=20,
             sticky="nsew"
         )
-        self.input.bind("<Return>", self.check_id)
-        self.input.focus_set()
 
+
+        
         self.result_msg = customtkinter.CTkLabel(
             self,
             height=140,
@@ -37,7 +60,7 @@ class App(customtkinter.CTk):
             fg_color="transparent"
         )
         self.result_msg.grid(
-            row=2,
+            row=1,
             column=0,
             padx=20,
             pady=20,
