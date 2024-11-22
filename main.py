@@ -17,45 +17,35 @@ kb_down_image = customtkinter.CTkImage(
 class KBFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
-        self.grid_columnconfigure(0, weight=1)
-        # Allow centering the keyboard
-        self.grid_rowconfigure((0, 1, 2, 3, 4), weight=1)
+        self.grid_columnconfigure((0, 1, 2), weight=1)  # Allow columns to stretch
+        self.grid_rowconfigure((0, 1, 2, 3), weight=1)  # Allow rows to stretch
         self.create_keyboard()
 
     def create_keyboard(self):
         keys = [
-
-            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-            ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-            ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-            ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
-
+            ['1', '2', '3'],
+            ['4', '5', '6'],
+            ['7', '8', '9'],
+            ['0']  # Last row, single button spanning all columns
         ]
 
         # Dynamically create buttons
         for r, row in enumerate(keys):
-            row_frame = customtkinter.CTkFrame(
-                self, fg_color="transparent")  # Create a row container
-            row_frame.grid(row=r, column=0, pady=0, padx=0, sticky="nsew")
-            row_frame.grid_columnconfigure(tuple(range(len(row))), weight=1)
-            row_frame.grid_rowconfigure(0, weight=1)
-
             for c, key in enumerate(row):
-                if key == 'Backspace':
+                # Special case for the last row
+                if r == 3 and key == '0':
                     btn = customtkinter.CTkButton(
-                        row_frame, text=key, command=lambda k=key: self.type_key(k), image=bp_image, compound="left", font=("Arial", 25), height=44
-                    )
-                elif key == '確認':
-                    btn = customtkinter.CTkButton(
-                        row_frame, text=key, command=lambda k=key: self.type_key(k), image=check_image, compound="left", fg_color="green", font=("Arial", 25), height=44
-                    )
-                else:
-                    btn = customtkinter.CTkButton(
-                        row_frame, text=key, command=lambda k=key: self.type_key(
+                        self, text=key, command=lambda k=key: self.type_key(
                             k), font=("Arial", 25), height=44
                     )
-
-                btn.grid(row=0, column=c, padx=5, pady=5, sticky="ns")
+                    btn.grid(row=r, column=0, columnspan=3,
+                             padx=5, pady=5, sticky="nsew")
+                else:
+                    btn = customtkinter.CTkButton(
+                        self, text=key, command=lambda k=key: self.type_key(
+                            k), font=("Arial", 25), height=44
+                    )
+                    btn.grid(row=r, column=c, padx=5, pady=5, sticky="nsew")
 
     def type_key(self, key):
         print(f"Key pressed: {key}")
@@ -63,6 +53,7 @@ class KBFrame(customtkinter.CTkFrame):
         self.master.input.delete(0, "end")  # Clear current input
         self.master.input.insert(
             "end", current_text + key)  # Append new key
+
 
 
 class LabelFrame(customtkinter.CTkFrame):
@@ -185,10 +176,10 @@ class App(customtkinter.CTk):
             self.btn.configure(image=kb_image)
             self.toggle_status = "lbl"
 
-    def check_id(self, event):
+    def check_id(self, event=None):
         try:
-            combined_url = f'{
-                str(config["API_URL"])}/{str(config["DEVICE_NUM"])}/{self.input.get()}'
+            combined_url = f"""{
+                str(config["API_URL"])}/{str(config["DEVICE_NUM"])}/{self.input.get()}"""
             print(f"code entered: {self.input.get()}")
             r = requests.get(combined_url, timeout=5)
             r.raise_for_status()
