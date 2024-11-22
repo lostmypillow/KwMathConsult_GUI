@@ -15,7 +15,9 @@ python-dotenv==1.0.1
 reportlab==4.2.5
 requests==2.32.3
 setuptools==75.3.0
+sv-ttk==2.6.0
 svglib==1.5.1
 tinycss2==1.4.0
+ttkthemes==3.2.2
 urllib3==2.2.3
 webencodings==0.5.1
