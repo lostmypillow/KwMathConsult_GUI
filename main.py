@@ -13,7 +13,6 @@ config = dotenv_values(".env")
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-
         self.title("Consultation")
         self.geometry("800x480")
         self.grid_columnconfigure((0, 1, 2), weight=1)
@@ -67,8 +66,8 @@ class App(tk.Tk):
     def check_id(self, event=None):
         try:
             combined_url = f"""{
-                config['API_URL']}/{config['DEVICE_NUM']}/{self.input.get()}"""
-            print(f"Code entered: {self.input.get()}")
+                str(config["API_URL"])}/{str(config["DEVICE_NUM"])}/{self.input.get()}"""
+            print(f"code entered: {self.input.get()}")
             r = requests.get(combined_url, timeout=5)
             r.raise_for_status()
             print(r.text)
