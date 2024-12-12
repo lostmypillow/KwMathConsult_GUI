@@ -15,7 +15,7 @@ class App(tk.Tk):
         super().__init__()
         self.title("Consultation")
         self.geometry("800x480")
-        self.attributes("-fullscreen", True if str(config["FULLSCREEN"]) == "True" else False)
+        self.attributes("-fullscreen", True)
         self.grid_columnconfigure((0, 1, 2), weight=1)
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=1)
