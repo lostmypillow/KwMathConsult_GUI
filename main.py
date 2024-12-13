@@ -93,21 +93,21 @@ class App(tk.Tk):
             self.destroy()
         print(self.input.get())
         print(type(self.input.get()))
-        self.input.delete(0, "end")
         self.results.configure(text="處理中")
         try:
-            combined_url = f"""{
-                str(config["API_URL"])}/{str(config["DEVICE_NUM"])}/{self.input.get()}"""
+            combined_url = f"http://192.168.2.6:8001/{str(config["DEVICE_NUM"])}/{self.input.get()}"""
             print(f"code entered: {self.input.get()}")
             r = requests.get(combined_url, timeout=5)
             r.raise_for_status()
             print(r.text)
             self.results.configure(text=str(r.text))
+            self.input.delete(0, "end")
             self.after(3000, self.reset)
 
         except Exception as e:
             print(f"Error: {e}")
             self.results.configure(text="刷卡失敗")
+            self.input.delete(0, "end")
             self.after(3000, self.reset)
 
 
