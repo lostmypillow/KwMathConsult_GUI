@@ -41,7 +41,7 @@ class App(tk.Tk):
             text="請刷卡或輸入卡號",
             font=("Arial", 45),
             anchor='center'
-            )
+        )
         self.results.grid(
             row=1,
             column=0,
@@ -66,7 +66,7 @@ class App(tk.Tk):
             row=2,
             columnspan=3,
             sticky="nsew"
-            )
+        )
         self.buttons.confirm_btn.grid_remove()
         self.buttons.delete_btn.grid_remove()
 
@@ -82,11 +82,11 @@ class App(tk.Tk):
             self.numpad.grid()
             self.buttons.show_btns()
             self.is_kb_open = True
+
     def reset(self):
-        
+
         self.results.configure(text="請刷卡或輸入卡號")
         self.input.focus_set()
-
 
     def check_id(self, event=None):
         if self.input.get() == "10369601":
@@ -95,7 +95,7 @@ class App(tk.Tk):
         print(type(self.input.get()))
         self.results.configure(text="處理中")
         try:
-            combined_url = f"http://192.168.2.6:8001/{str(config["DEVICE_NUM"])}/{self.input.get()}"""
+            combined_url = f'http://192.168.2.6:8001/{str(config["DEVICE_NUM"])}/{self.input.get()}'
             print(f"code entered: {self.input.get()}")
             r = requests.get(combined_url, timeout=5)
             r.raise_for_status()
