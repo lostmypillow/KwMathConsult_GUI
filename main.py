@@ -20,7 +20,9 @@ class App(tk.Tk):
         self.grid_columnconfigure((0, 1, 2), weight=1)
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=0)
+        self.grid_rowconfigure(3, weight=0)
+        self.stored_teacher_name = ""
+        self.teacher = ""
 
         self.is_kb_open = False
 
@@ -36,9 +38,10 @@ class App(tk.Tk):
         self.input.bind("<Return>", self.check_id)
         self.input.focus_set()
 
+
         self.results = ttk.Label(
             self,
-            text="請刷卡或輸入卡號",
+            text= self.teacher + "請刷卡或輸入卡號",
             font=("Arial", 45),
             anchor='center'
         )
@@ -85,7 +88,7 @@ class App(tk.Tk):
 
     def reset(self):
 
-        self.results.configure(text="請刷卡或輸入卡號")
+        self.results.configure(text=self.teacher + "請刷卡或輸入卡號")
         self.input.focus_set()
 
     def check_id(self, event=None):
@@ -100,7 +103,15 @@ class App(tk.Tk):
             r = requests.get(combined_url, timeout=5)
             r.raise_for_status()
             print(r.text)
-            self.results.configure(text=str(r.text))
+            if "老師" in r.text:
+                name = r.text.split(' ')[0].replace("老師", "").replace('"', '')
+                if name == self.stored_teacher_name:
+                    print("same")
+                    self.teacher = self.stored_teacher_name = ""
+                else:
+                    self.stored_teacher_name = name
+                    self.teacher = "老師: " + name  + "\n\n"
+            self.results.configure(text=str(r.text).replace('"', ''))
             self.input.delete(0, "end")
             self.after(3000, self.reset)
 
