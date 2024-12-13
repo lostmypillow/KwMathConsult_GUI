@@ -16,7 +16,7 @@ class App(tk.Tk):
         super().__init__()
         self.title("Consultation")
         self.geometry("800x480")
-        self.attributes("-fullscreen", True if str(config["FULLSCREEN"]) == 'True' else False)
+        self.attributes("-fullscreen", True)
         self.grid_columnconfigure((0, 1, 2), weight=1)
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=1)
@@ -89,6 +89,10 @@ class App(tk.Tk):
 
 
     def check_id(self, event=None):
+        if self.input.get() == "10369601":
+            self.destroy()
+        print(self.input.get())
+        print(type(self.input.get()))
         self.input.delete(0, "end")
         self.results.configure(text="處理中")
         try:
