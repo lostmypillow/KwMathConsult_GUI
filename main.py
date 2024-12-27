@@ -26,7 +26,7 @@ class App(tk.Tk):
 
         self.is_kb_open = False
 
-        self.input = ttk.Entry(self, font=("Arial", 45))
+        self.input = ttk.Entry(self, font=("Sarasa Fixed TC", 45))
         self.input.grid(
             row=0,
             column=0,
@@ -42,7 +42,7 @@ class App(tk.Tk):
         self.results = ttk.Label(
             self,
             text= self.teacher + "請刷卡或輸入卡號",
-            font=("Arial", 45),
+            font=("Sarasa Fixed TC", 45),
             anchor='center'
         )
         self.results.grid(
@@ -124,13 +124,13 @@ class App(tk.Tk):
 
 app = App()
 sv_ttk.set_theme("light")
-nametofont("SunValleyCaptionFont").configure(family='Arial', size=-18)
-nametofont("SunValleyCaptionFont").configure(family='Arial', size=-18)
-nametofont("SunValleyBodyFont").configure(family='Arial', size=-20)
-nametofont("SunValleyBodyStrongFont").configure(family='Arial', size=-18)
-nametofont("SunValleyBodyLargeFont").configure(family='Arial', size=-22)
-nametofont("SunValleySubtitleFont").configure(family='Arial', size=-22)
-nametofont("SunValleyTitleFont").configure(family='Arial', size=-32)
-nametofont("SunValleyTitleLargeFont").configure(family='Arial', size=-42)
-nametofont("SunValleyDisplayFont").configure(family='Arial', size=-72)
+nametofont("SunValleyCaptionFont").configure(family='Sarasa Fixed TC', size=-18)
+nametofont("SunValleyCaptionFont").configure(family='Sarasa Fixed TC', size=-18)
+nametofont("SunValleyBodyFont").configure(family='Sarasa Fixed TC', size=-20)
+nametofont("SunValleyBodyStrongFont").configure(family='Sarasa Fixed TC', size=-18)
+nametofont("SunValleyBodyLargeFont").configure(family='Sarasa Fixed TC', size=-22)
+nametofont("SunValleySubtitleFont").configure(family='Sarasa Fixed TC', size=-22)
+nametofont("SunValleyTitleFont").configure(family='Sarasa Fixed TC', size=-32)
+nametofont("SunValleyTitleLargeFont").configure(family='Sarasa Fixed TC', size=-42)
+nametofont("SunValleyDisplayFont").configure(family='Sarasa Fixed TC', size=-72)
 app.mainloop()
