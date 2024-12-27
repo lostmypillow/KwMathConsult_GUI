@@ -6,8 +6,8 @@ set -e
 echo "[SETUP 1 / 10] Updating system..."
 sudo apt update
 
-echo "[SETUP 2 / 10] Ensuring python and pip are installed..."
-sudo apt install -y python3-venv python3-pip
+echo "[SETUP 2 / 10] Ensuring python, pip and tk are installed..."
+sudo apt install -y python3-venv python3-pip python3-tk
 
 
 
