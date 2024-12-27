@@ -103,7 +103,7 @@ class App(tk.Tk):
             r = requests.get(combined_url, timeout=5)
             r.raise_for_status()
             print(r.text)
-            if "老師" in r.text:
+            if "老師 刷卡成功" in r.text:
                 name = r.text.split(' ')[0].replace("老師", "").replace('"', '')
                 if name == self.stored_teacher_name:
                     print("same")
