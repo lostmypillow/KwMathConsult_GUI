@@ -3,19 +3,28 @@
 # Exit on error
 set -e
 
+echo "[SETUP 1 / 9] Updating system..."
+sudo apt update
+
+echo "[SETUP 2 / 9] Ensuring python and pip are installed..."
+sudo apt install python3-venv python3-pip
+
+
+
 # 1. Create and activate virtual environment
 if [ ! -d ".venv" ]; then
-    echo "Creating virtual environment..."
+    echo "[SETUP 3 / 9] Creating virtual environment..."
     python3 -m venv .venv
 fi
 
 # Activate the virtual environment
-echo "Activating virtual environment..."
+echo "[SETUP 4 / 9] Activating virtual environment..."
 source .venv/bin/activate
 
+echo "[SETUP 5 / 9] Checking for Sarasa font in this system..."
 # 2. Check if 'Sarasa Fixed TC' font is installed
 if ! fc-list | grep -i "Sarasa Fixed TC"; then
-    echo "Font 'Sarasa Fixed TC' not found. Installing..."
+    echo "[SETUP 5.1 / 9] Font 'Sarasa Fixed TC' not found. Installing..."
 
     # Download the Sarasa Fixed TC font archive
     FONT_URL="https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.26/SarasaFixed-TTF-1.0.26.7z"
@@ -41,22 +50,22 @@ if ! fc-list | grep -i "Sarasa Fixed TC"; then
     # Clean up the downloaded archive and extracted files
     rm -rf $FONT_ARCHIVE SarasaFixed
 
-    echo "'Sarasa Fixed TC' font installed successfully."
+    echo "[SETUP 5.2 / 9] 'Sarasa Fixed TC' font installed successfully."
 else
-    echo "Font 'Sarasa Fixed TC' is already installed."
+    echo "[SETUP 5.1 / 9] Font 'Sarasa Fixed TC' is already installed."
 fi
 
 # 3. Run python -m build
-echo "Running python -m build..."
+echo "[SETUP 6 / 9] Building executable..."
 python -m build
 
 # 4. Check and modify .env file in /dist
-echo "Changing directory to /dist"
+echo "[SETUP 7 / 9] Setting up .env file..."
 cd dist
 
 # Check if .env file exists, create if it doesn't
 if [ ! -f ".env" ]; then
-    echo ".env file not found, creating one..."
+    echo "[SETUP 7.1 / 9] .env file not found, creating one..."
     echo "DEVICE_NUM=1" > .env
     echo "API_URL=http://192.168.2.6:8001" >> .env
 fi
@@ -77,12 +86,12 @@ if [ -n "$NEW_API_URL" ]; then
 fi
 
 # 5. Countdown before running ./main
-echo "Countdown to run ./main..."
+echo "[SETUP 8 / 9] Preparing to run executable in"
 for i in {3..1}; do
     echo "$i..."
     sleep 1
 done
 
 # Run ./main (assuming it's an executable or script)
-echo "Running ./main..."
+echo "[SETUP 9 / 9] Running ./main..."
 ./main
