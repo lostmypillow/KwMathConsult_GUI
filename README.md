@@ -46,8 +46,8 @@ python3 -m build
 
 ## Production
 ```bash
-chmod +x run.sh
-sudo ./run.sh
+chmod +x setup.sh
+sudo ./setup.sh
 ```
 The bash script will install all necessary prerequisites, activate virtual environment, install pip requirements, build and run the executable on a countdown of 3 seconds. It will prompt for changes in the env file, namely device number and API URL, change it then if needed. 
 
