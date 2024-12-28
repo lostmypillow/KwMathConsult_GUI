@@ -3,6 +3,22 @@
 # Exit on error
 set -e
 
+if [ ! -f ~/launch.sh ]; then
+    echo "Creating launch.sh in the home directory..."
+    
+    # Create launch.sh and add content
+    echo "#!/bin/bash
+cd \$(dirname \$0)
+sudo ./setup.sh" > ~/launch.sh
+    
+    # Make it executable
+    chmod +x ~/launch.sh
+    echo "[STEP 0] launch.sh created and made executable."
+else
+    echo "[STEP 0] launch.sh already exists in the home directory."
+fi
+
+
 echo "[STEP 1] Updating system..."
 sudo apt update
 
