@@ -68,9 +68,10 @@
         virtualenv: "{{ app_dir }}/.venv"
 
     - name: Run build.py script
-      command: "source {{ app_dir }}/.venv/bin/activate && python {{ app_dir }}/build.py"
+      command: python {{ app_dir }}/build.py
       args:
         chdir: "{{ app_dir }}"
+        executable: "{{ app_dir }}/.venv/bin/python"
 
     - name: Check if desktop has a 數輔.desktop file
       stat:
