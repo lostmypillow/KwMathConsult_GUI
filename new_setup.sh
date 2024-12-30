@@ -6,8 +6,13 @@ set -e
 echo "Updating system..."
 sudo apt update
 
-echo "Installing pipx..."
-sudo apt install -y pipx
+# Check if pipx is installed
+if ! command -v pipx &> /dev/null; then
+    echo "pipx not found. Installing pipx..."
+    sudo apt install -y pipx
+else
+    echo "pipx is already installed."
+fi
 
 echo "Ensuring pipx is in the PATH..."
 pipx ensurepath
@@ -24,8 +29,13 @@ else
     echo "No known shell configuration file found. You may need to manually reload your shell."
 fi
 
-echo "Installing Ansible via pipx..."
-pipx install --include-deps ansible
+# Check if Ansible is installed via pipx
+if ! pipx list | grep -q ansible; then
+    echo "Ansible is not installed via pipx. Installing Ansible..."
+    pipx install --include-deps ansible
+else
+    echo "Ansible is already installed via pipx."
+fi
 
 # Ensure .env file exists
 ENV_FILE=".env"
@@ -35,6 +45,8 @@ if [ ! -f "$ENV_FILE" ]; then
     echo "# Example environment variables" > $ENV_FILE
     echo "APP_ENV=production" >> $ENV_FILE
     echo "DEBUG=false" >> $ENV_FILE
+else
+    echo ".env file already exists."
 fi
 
 echo "Opening .env file for editing..."
@@ -48,5 +60,12 @@ echo "Ensure these environment variables are correct before proceeding."
 read -p "Press Enter to continue or Ctrl+C to abort."
 
 # Run Ansible playbook
-echo "Running Ansible playbook..."
-ansible-playbook -i "localhost," --connection=local kwconsultgui.yml
+PLAYBOOK_FILE="kwconsultgui.yml"
+
+if [ -f "$PLAYBOOK_FILE" ]; then
+    echo "Running Ansible playbook..."
+    ansible-playbook -i "localhost," --connection=local $PLAYBOOK_FILE
+else
+    echo "Playbook file $PLAYBOOK_FILE not found. Exiting."
+    exit 1
+fi
