@@ -1,18 +1,21 @@
-# Reservation System GUI
-- [Reservation System GUI](#reservation-system-gui)
+# **Kaowei Consult GUI**
+- [**Kaowei Consult GUI**](#kaowei-consult-gui)
   - [Development](#development)
     - [Prerequisites](#prerequisites)
       - [For VSCode users:](#for-vscode-users)
     - [Preview](#preview)
     - [Build](#build)
   - [Production](#production)
+  - [Problems I faced \& my solutions](#problems-i-faced--my-solutions)
+    - [Sub-process /usr/bin/dpkg returned error code (1) at sudo apt update in RPi](#sub-process-usrbindpkg-returned-error-code-1-at-sudo-apt-update-in-rpi)
+    - [HEAD not found when you git clone this repo](#head-not-found-when-you-git-clone-this-repo)
   - [Authors](#authors)
 
 
 
 ## Development
 ### Prerequisites
-If running this repo on Linux, please run the below command **before** creating a virtual environment:
+If developing this repo on Linux, please run the below command **before** creating a virtual environment:
 
 ```bash
 # Ubuntu/Debian/Raspbian OS
@@ -46,10 +49,54 @@ python3 -m build
 
 ## Production
 ```bash
-./new_setup.sh
+# if the RPi is outfitted with 3 inch touchscreen, run this first:
+sudo chmod +x screen-setup.sh
+sudo ./screen_setup.sh
 
+# Main setup script
+sudo chmod +x setup.sh
+sudo ./setup.sh
+
+# After script/Ansible is finished
+sudo reboot
 ```
-The bash script will install all necessary prerequisites, activate virtual environment, install pip requirements, build and run the executable on a countdown of 3 seconds. It will prompt for changes in the env file, namely device number and API URL, change it then if needed. 
+The bash script will install pipx and Ansible, and run the Ansible Playbook in `kwconsultgui.yml` 
+
+## Problems I faced & my solutions
+### Sub-process /usr/bin/dpkg returned error code (1) at sudo apt update in RPi
+And if it's about something something initramfs:
+
+1. Check the Current MODULES Setting
+```bash
+grep MODULES /etc/initramfs-tools/initramfs.conf
+```
+2. If it says dep:
+
+    Back up the current configuration:
+
+```bash
+cp /etc/initramfs-tools/initramfs.conf /etc/initramfs-tools/initramfs.conf.bak
+```
+
+3. Edit the file:
+
+```bash
+sudo nano /etc/initramfs-tools/initramfs.conf
+```
+
+4. Change `MODULES=dep` to `MODULES=most`
+
+5. Update initramfs for your current kernel:
+```bash
+sudo update-initramfs -u
+```
+6. Reboot
+```bash
+sudo reboot
+```
+### HEAD not found when you git clone this repo
+1. `cd` into the repo
+2. `git checkout main`
 
 ## Authors
 Johnny (Lost) - jmlin0101@gmail.com

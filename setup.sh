@@ -18,7 +18,6 @@ echo "Ensuring pipx is in the PATH..."
 pipx ensurepath
 
 # Source the shell configuration file to apply changes immediately
-# Adjust based on your shell (e.g., .bashrc, .zshrc)
 if [ -f "$HOME/.bashrc" ]; then
     echo "Sourcing .bashrc to apply pipx path changes..."
     source "$HOME/.bashrc"

@@ -111,8 +111,3 @@
         src: "/home/kaowei/Desktop/數輔.desktop"
         dest: "/home/kaowei/.config/autostart/數輔.desktop"
         mode: "0755"
-
-    - name: Reboot the system
-      reboot:
-        msg: "Rebooting after KwConsult GUI application setup"
-        reboot_timeout: 600
