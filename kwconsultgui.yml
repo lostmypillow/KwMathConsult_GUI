@@ -55,8 +55,8 @@
       file:
         path: "{{ app_dir }}"
         state: directory
-        owner: pi
-        group: pi
+        owner: kaowei
+        group: kaowei
 
     - name: Ensure virtual environment is created
       command: python3 -m venv {{ app_dir }}/.venv
