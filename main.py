@@ -15,7 +15,7 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Consultation")
-        self.geometry("800x480")
+        self.geometry("480x320")
         self.attributes("-fullscreen", True)
         self.grid_columnconfigure((0, 1, 2), weight=1)
         self.grid_rowconfigure(0, weight=0)
@@ -42,7 +42,7 @@ class App(tk.Tk):
         self.results = ttk.Label(
             self,
             text= self.teacher + "請刷卡或輸入卡號",
-            font=("Sarasa Fixed TC", 45),
+            font=("Sarasa Fixed TC", 24),
             anchor='center'
         )
         self.results.grid(

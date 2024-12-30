@@ -3,61 +3,97 @@
 # Exit on error
 set -e
 
-if [ ! -f ~/launch.sh ]; then
-    echo "Creating launch.sh in the home directory..."
-    
-    # Create launch.sh and add content
-    echo "#!/bin/bash
-cd \$(dirname \$0)
-sudo ./setup.sh" > ~/launch.sh
-    
-    # Make it executable
-    chmod +x ~/launch.sh
-    echo "[STEP 0] launch.sh created and made executable."
-else
-    echo "[STEP 0] launch.sh already exists in the home directory."
-fi
-
-
-echo "[STEP 1] Updating system..."
+echo "Updating system..."
 sudo apt update
 
-echo "[STEP 2] Ensuring python and pip are installed..."
-sudo apt install -y python3-venv python3-pip
-
-if ! fc-list | grep -i "Sarasa Fixed TC"; then
-    echo "[STEP 3] Font 'Sarasa Fixed TC' not found. Installing..."
-
-    # Download the Sarasa Fixed TC font archive
-    FONT_URL="https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.26/SarasaFixed-TTF-1.0.26.7z"
-    FONT_ARCHIVE="SarasaFixed-TTF-1.0.26.7z"
-    sudo apt install -y wget p7zip-full
-    wget -O $FONT_ARCHIVE $FONT_URL
-    7z x $FONT_ARCHIVE -oSarasaFixed
-    sudo cp -r SarasaFixed/* /usr/share/fonts/
-    echo "Refreshing font cache..."
-    sudo fc-cache -fv
-    rm -rf $FONT_ARCHIVE SarasaFixed
+# Check if pipx is installed
+if ! command -v pipx &> /dev/null; then
+    echo "pipx not found. Installing pipx..."
+    sudo apt install -y pipx
 else
-    echo "[STEP 3] Font 'Sarasa Fixed TC' is already installed."
+    echo "pipx is already installed."
 fi
 
-echo "[STEP 4] Creating virtual environment if one isn't created..."
-if [ ! -d ".venv" ]; then 
-    python3 -m venv .venv
+echo "Ensuring pipx is in the PATH..."
+pipx ensurepath
+
+# Source the shell configuration file to apply changes immediately
+# Adjust based on your shell (e.g., .bashrc, .zshrc)
+if [ -f "$HOME/.bashrc" ]; then
+    echo "Sourcing .bashrc to apply pipx path changes..."
+    source "$HOME/.bashrc"
+elif [ -f "$HOME/.zshrc" ]; then
+    echo "Sourcing .zshrc to apply pipx path changes..."
+    source "$HOME/.zshrc"
+else
+    echo "No known shell configuration file found. You may need to manually reload your shell."
 fi
 
-echo "[STEP 5] Activating virtual environment..."
-source .venv/bin/activate
+# Check if Ansible is installed via pipx
+if ! pipx list | grep -q ansible; then
+    echo "Ansible is not installed via pipx. Installing Ansible..."
+    pipx install --include-deps ansible
+else
+    echo "Ansible is already installed via pipx."
+fi
 
+# Ensure .env file exists
+ENV_FILE=".env"
 
-echo "[STEP 6] Installing from requirements.txt"
-pip install -r requirements.txt
+if [ ! -f "$ENV_FILE" ]; then
+    echo "No .env file found. Creating a new one..."
+    echo "# Example environment variables" > $ENV_FILE
+    echo "APP_ENV=production" >> $ENV_FILE
+    echo "DEBUG=false" >> $ENV_FILE
+else
+    echo ".env file already exists."
+fi
 
-echo "[STEP 7] Preparing to run KwConsult in"
-for i in {3..1}; do
-    echo "$i..."
-    sleep 1
-done
+echo "Opening .env file for editing..."
+nano $ENV_FILE
 
-python main.py
+# Confirm the file was edited
+echo "Review the .env file:"
+cat $ENV_FILE
+
+echo "Ensure these environment variables are correct before proceeding."
+read -p "Press Enter to continue or Ctrl+C to abort."
+
+# Run Ansible playbook
+PLAYBOOK_FILE="kwconsultgui.yml"
+
+if [ -f "$PLAYBOOK_FILE" ]; then
+    echo "Running Ansible playbook..."
+    ansible-playbook -i "localhost," --connection=local $PLAYBOOK_FILE
+else
+    echo "Playbook file $PLAYBOOK_FILE not found. Exiting."
+    exit 1
+fi
+
+# Prevent screen from turning off (Raspberry Pi specific)
+echo "Disabling screen blanking via autostart..."
+
+# Check if the autostart file exists
+AUTOSTART_FILE="/home/pi/.config/lxsession/LXDE-pi/autostart"
+if [ ! -f "$AUTOSTART_FILE" ]; then
+    echo "Autostart file not found. Creating the file..."
+    mkdir -p /home/pi/.config/lxsession/LXDE-pi
+    touch $AUTOSTART_FILE
+fi
+
+# Add xset commands to disable screen blanking and power-saving if not already there
+if ! grep -q "@xset -dpms" "$AUTOSTART_FILE"; then
+    echo "@xset -dpms" >> "$AUTOSTART_FILE"
+    echo "Added @xset -dpms to autostart."
+fi
+
+if ! grep -q "@xset s off" "$AUTOSTART_FILE"; then
+    echo "@xset s off" >> "$AUTOSTART_FILE"
+    echo "Added @xset s off to autostart."
+fi
+
+echo "Screen blanking and power-saving disabled via autostart file."
+
+# Reboot to apply all changes
+echo "Rebooting the system..."
+sudo reboot

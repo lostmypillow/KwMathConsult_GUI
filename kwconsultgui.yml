@@ -1,4 +1,3 @@
----
 - name: Deploy KwConsult GUI Application on Raspberry Pi
   hosts: localhost
   become: true
@@ -68,35 +67,52 @@
         requirements: "{{ app_dir }}/requirements.txt"
         virtualenv: "{{ app_dir }}/.venv"
 
-    - name: Create systemd service for KwConsult
+    - name: Run build.py script
+      command: "{{ app_dir }}/build.py"
+      args:
+        chdir: "{{ app_dir }}"
+
+    - name: Check if desktop has a 數輔.desktop file
+      stat:
+        path: "/home/kaowei/Desktop/數輔.desktop"
+      register: desktop_file
+
+    - name: Create 數輔.desktop file on Desktop if not present
       copy:
-        dest: /etc/systemd/system/kwconsultgui.service
+        dest: "/home/kaowei/Desktop/數輔.desktop"
         content: |
-          [Unit]
-          Description=KwConsult GUI Application
-          After=graphical.target
+          [Desktop Entry]
+          Version=1.0
+          Name=數輔
+          Comment=Launch KwConsult GUI Application
+          Exec=/bin/bash -c "cd {{ playbook_dir }}/KwConsult_tk/dist && ./main"
+          Icon=application-x-executable
+          Terminal=false
+          Type=Application
+          Categories=Utility;Application;
+          StartupNotify=true
+        mode: "0755"
+      when: not desktop_file.stat.exists
 
-          [Service]
-          Type=simple
-          WorkingDirectory={{ app_dir }}
-          ExecStart=/bin/bash -c "source {{ app_dir }}/.venv/bin/activate && python main.py"
-          Restart=always
-          Environment="DISPLAY=:0"
-          Environment="XDG_RUNTIME_DIR=/run/user/1000"
+    - name: Check if .config/autostart directory exists
+      stat:
+        path: "/home/kaowei/.config/autostart"
+      register: autostart_dir
 
-          [Install]
-          WantedBy=graphical.target
-        mode: "0644"
-      notify: Restart kwconsultgui service
+    - name: Create .config/autostart directory if not present
+      file:
+        path: "/home/kaowei/.config/autostart"
+        state: directory
+        mode: "0755"
+      when: not autostart_dir.stat.exists
 
-    - name: Enable and start KwConsult service
-      systemd:
-        name: kwconsultgui.service
-        enabled: yes
-        state: started
+    - name: Copy 數輔.desktop file to .config/autostart
+      copy:
+        src: "/home/kaowei/Desktop/數輔.desktop"
+        dest: "/home/kaowei/.config/autostart/數輔.desktop"
+        mode: "0755"
 
-  handlers:
-    - name: Restart kwconsultgui service
-      systemd:
-        name: kwconsultgui.service
-        state: restarted
+    - name: Reboot the system
+      reboot:
+        msg: "Rebooting after KwConsult GUI application setup"
+        reboot_timeout: 600
