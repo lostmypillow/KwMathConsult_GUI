@@ -68,7 +68,7 @@
         virtualenv: "{{ app_dir }}/.venv"
 
     - name: Run build.py script
-      command: "python {{ app_dir }}/build.py"
+      command: "source {{ app_dir }}/.venv/bin/activate && python {{ app_dir }}/build.py"
       args:
         chdir: "{{ app_dir }}"
 
