@@ -5,7 +5,7 @@
   vars:
     font_url: "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.26/SarasaFixed-TTF-1.0.26.7z"
     font_archive: "/tmp/SarasaFixed-TTF-1.0.26.7z"
-    app_dir: "/home/pi/kwconsult"
+    app_dir: "{{ playbook_dir }}"
 
   tasks:
     - name: Ensure necessary packages are installed
