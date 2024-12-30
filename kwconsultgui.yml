@@ -1,6 +1,6 @@
 ---
 - name: Deploy KwConsult GUI Application on Raspberry Pi
-  hosts: raspberrypi
+  hosts: localhost
   become: true
   vars:
     font_url: "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.26/SarasaFixed-TTF-1.0.26.7z"
