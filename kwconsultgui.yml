@@ -67,11 +67,10 @@
         requirements: "{{ app_dir }}/requirements.txt"
         virtualenv: "{{ app_dir }}/.venv"
 
-    - name: Run build.py script
-      command: python {{ app_dir }}/build.py
+    - name: Run build.py script with virtual environment activated
+      command: /bin/bash -c "source {{ app_dir }}/.venv/bin/activate && python {{ app_dir }}/build.py"
       args:
         chdir: "{{ app_dir }}"
-        executable: "{{ app_dir }}/.venv/bin/python"
 
     - name: Check if desktop has a 數輔.desktop file
       stat:
@@ -86,7 +85,7 @@
           Version=1.0
           Name=數輔
           Comment=Launch KwConsult GUI Application
-          Exec=/bin/bash -c "cd {{ playbook_dir }}/KwConsult_tk/dist && ./main"
+          Exec=/bin/bash -c "cd {{ app_dir }}/dist && ./main"
           Icon=application-x-executable
           Terminal=false
           Type=Application
