@@ -22,9 +22,9 @@ class NumpadFrame(ttk.Frame):
                     self, text=key, command=lambda k=key: self.type_key(k))
                 if r == 3 and key == '0':
                     btn.grid(row=r, column=0, columnspan=3,
-                             padx=5, pady=5, sticky="nsew")
+                             padx=2, pady=2, sticky="nsew")
                 else:
-                    btn.grid(row=r, column=c, padx=5, pady=5, sticky="nsew")
+                    btn.grid(row=r, column=c, padx=2, pady=2, sticky="nsew")
 
     def type_key(self, key):
         print(f"Key pressed: {key}")
