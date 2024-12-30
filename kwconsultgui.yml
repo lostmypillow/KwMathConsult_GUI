@@ -1,0 +1,102 @@
+---
+- name: Deploy KwConsult GUI Application on Raspberry Pi
+  hosts: raspberrypi
+  become: true
+  vars:
+    font_url: "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.26/SarasaFixed-TTF-1.0.26.7z"
+    font_archive: "/tmp/SarasaFixed-TTF-1.0.26.7z"
+    app_dir: "/home/pi/kwconsult"
+
+  tasks:
+    - name: Ensure necessary packages are installed
+      apt:
+        name:
+          - python3-venv
+          - python3-pip
+          - python3-tk
+          - wget
+          - p7zip-full
+        state: present
+        update_cache: yes
+
+    - name: Check if Sarasa Fixed TC font is installed
+      command: fc-list
+      register: fc_list_output
+      changed_when: false
+
+    - name: Install Sarasa Fixed TC font if not installed
+      block:
+        - name: Download Sarasa Fixed TC font archive
+          get_url:
+            url: "{{ font_url }}"
+            dest: "{{ font_archive }}"
+
+        - name: Extract Sarasa Fixed TC font archive
+          command: "7z x {{ font_archive }} -o/tmp/SarasaFixed"
+          args:
+            creates: /tmp/SarasaFixed
+
+        - name: Copy fonts to system font directory
+          copy:
+            src: /tmp/SarasaFixed/
+            dest: /usr/share/fonts/
+            remote_src: yes
+
+        - name: Refresh font cache
+          command: "fc-cache -fv"
+
+        - name: Clean up font archive
+          file:
+            path: "{{ font_archive }}"
+            state: absent
+      when: "'Sarasa Fixed TC' not in fc_list_output.stdout"
+
+    - name: Ensure application directory exists
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: pi
+        group: pi
+
+    - name: Ensure virtual environment is created
+      command: python3 -m venv {{ app_dir }}/.venv
+      args:
+        creates: "{{ app_dir }}/.venv"
+
+    - name: Install Python dependencies
+      pip:
+        requirements: "{{ app_dir }}/requirements.txt"
+        virtualenv: "{{ app_dir }}/.venv"
+
+    - name: Create systemd service for KwConsult
+      copy:
+        dest: /etc/systemd/system/kwconsultgui.service
+        content: |
+          [Unit]
+          Description=KwConsult GUI Application
+          After=graphical.target
+
+          [Service]
+          Type=simple
+          WorkingDirectory={{ app_dir }}
+          ExecStart=/bin/bash -c "source {{ app_dir }}/.venv/bin/activate && python main.py"
+          Restart=always
+          Environment="DISPLAY=:0"
+          Environment="XDG_RUNTIME_DIR=/run/user/1000"
+
+          [Install]
+          WantedBy=graphical.target
+        mode: "0644"
+      notify: Restart kwconsultgui service
+
+    - name: Enable and start KwConsult service
+      systemd:
+        name: kwconsultgui.service
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: Restart kwconsultgui service
+      systemd:
+        name: kwconsultgui.service
+        state: restarted
