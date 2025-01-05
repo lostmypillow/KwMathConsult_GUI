@@ -6,7 +6,7 @@ APP_DIR="$(pwd)"
 
 
 echo "SETUP [Update system]"
-sudo apt update -qq >/dev/null
+sudo apt full-upgrade -qq >/dev/null
 echo "ok"
 
 echo "SETUP [Ensure necessary packages are installed]"
