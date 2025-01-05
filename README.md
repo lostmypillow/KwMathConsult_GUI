@@ -53,14 +53,13 @@ python3 -m build
 sudo chmod +x screen-setup.sh
 sudo ./screen_setup.sh
 
-# Main setup script
+# Main setup script (it will install prereqs & auto start Ansible playbook)
 sudo chmod +x setup.sh
 sudo ./setup.sh
 
-# After script/Ansible is finished
+# After setup script is finished
 sudo reboot
 ```
-The bash script will install pipx and Ansible, and run the Ansible Playbook in `kwconsultgui.yml` 
 
 ## Problems I faced & my solutions
 ### Sub-process /usr/bin/dpkg returned error code (1) at sudo apt update in RPi
