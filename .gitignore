@@ -1,6 +1,0 @@
-build
-dist
-.venv
-*.spec
-__pycache__
-frames/__pycache__

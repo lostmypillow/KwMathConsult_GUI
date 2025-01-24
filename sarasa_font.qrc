@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/fonts">
+        <file>sarasa_font.ttf</file>
+    </qresource>
+</RCC>
