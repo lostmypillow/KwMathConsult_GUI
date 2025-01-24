@@ -1,136 +1,147 @@
-import tkinter as tk
-from tkinter import ttk
-from dotenv import dotenv_values
-from ttkthemes import ThemedTk
-from frames.numpad import NumpadFrame
-from frames.buttons import ButtonsFrame
-from tkinter.font import nametofont
-import requests
-import time
-import sv_ttk
-config = dotenv_values(".env")
+# main_app.py
+import sys
+import os
+import sarasa_font
+from PySide6.QtWidgets import QApplication, QMainWindow, QGridLayout, QWidget
+from PySide6.QtGui import QFontDatabase, QFont
+from PySide6.QtCore import QTimer
+from config import BASE_URL, REQUEST_TIMEOUT, FONT_PATH, FONT_SIZE, RESULTS_FONT_SIZE
+from network_worker import NetworkWorker
+from ui_creation import create_button, create_label, create_input, create_numpad
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
 
-class App(tk.Tk):
+class App(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.title("Consultation")
-        self.geometry("480x320")
-        self.attributes("-fullscreen", True)
-        self.grid_columnconfigure((0, 1, 2), weight=1)
-        self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(3, weight=0)
-        self.stored_teacher_name = ""
-        self.teacher = ""
+        self.setWindowTitle("數輔刷卡")
+        self.setGeometry(0, 0, 480, 320)
 
+        # Set up the main UI
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+
+        self.layout = QGridLayout(self.central_widget)
+
+        # Create input field for card number
+        self.input = create_input(font_size=FONT_SIZE)
+        self.layout.addWidget(self.input)
+        self.input.returnPressed.connect(self.check_id)
+
+        # Results label
+        self.results = create_label("請刷卡或輸入卡號", font_size=RESULTS_FONT_SIZE)
+        self.layout.addWidget(self.results)
+
+        # Initialize numpad (can be toggled)
+        self.numpad_frame = QWidget()
+        self.numpad_layout = QGridLayout(self.numpad_frame)
+        self.layout.addWidget(self.numpad_frame)
+        self.numpad_frame.hide()
         self.is_kb_open = False
+        self.init_numpad()
 
-        self.input = ttk.Entry(self, font=("Sarasa Fixed TC", 45))
-        self.input.grid(
-            row=0,
-            column=0,
-            padx=10,
-            pady=10,
-            sticky="nsew",
-            columnspan=3
-        )
-        self.input.bind("<Return>", self.check_id)
-        self.input.focus_set()
+        # Initialize buttons
+        self.buttons_frame = QWidget()
+        self.buttons_layout = QGridLayout(self.buttons_frame)
+        self.layout.addWidget(self.buttons_frame)
+        self.init_buttons()
 
+    def init_buttons(self):
+        """Initialize buttons like delete, open keyboard, and confirm"""
+        self.delete_btn = create_button("刪除", self.delete_digit)
+        self.open_btn = create_button("開啟鍵盤", self.toggle_keyboard)
+        self.confirm_btn = create_button("確認", self.check_id)
 
-        self.results = ttk.Label(
-            self,
-            text= self.teacher + "請刷卡或輸入卡號",
-            font=("Sarasa Fixed TC", 24),
-            anchor='center'
-        )
-        self.results.grid(
-            row=1,
-            column=0,
-            padx=10,
-            pady=10,
-            sticky="nsew",
-            columnspan=3
-        )
+        self.buttons_layout.addWidget(self.delete_btn, 0, 0)
+        self.buttons_layout.addWidget(self.open_btn, 0, 1)
+        self.buttons_layout.addWidget(self.confirm_btn, 0, 2)
 
-        self.numpad = NumpadFrame(self)
-        self.numpad.grid(
-            row=1,
-            padx=2,
-            pady=2,
-            sticky="nsew",
-            columnspan=3
-        )
-        self.numpad.grid_remove()
+        self.delete_btn.hide()
+        self.confirm_btn.hide()
 
-        self.buttons = ButtonsFrame(self)
-        self.buttons.grid(
-            row=2,
-            columnspan=3,
-            sticky="nsew"
-        )
-        self.buttons.confirm_btn.grid_remove()
-        self.buttons.delete_btn.grid_remove()
+    def init_numpad(self):
+        """Initialize the numpad with keys"""
+        keys = [
+            ['7', '8', '9'],
+            ['4', '5', '6'],
+            ['1', '2', '3'],
+            ['0']
+        ]
+        create_numpad(self.numpad_layout, keys, self.type_key)
 
-    def hide_label(self):
-        if self.is_kb_open:
-            self.numpad.grid_remove()
-            self.results.grid()
-            self.buttons.hide_btns()
-            self.is_kb_open = False
-            self.input.focus_set()
-        else:
-            self.results.grid_remove()
-            self.numpad.grid()
-            self.buttons.show_btns()
-            self.is_kb_open = True
+    def type_key(self, key):
+        """Handle typing a key in the input field"""
+        current_text = self.input.text()
+        self.input.setText(current_text + key)
+
+    def check_id(self):
+        """Handles ID check and makes network request"""
+        user_input = self.input.text()
+        if user_input == "10369601":
+            self.close()
+
+        self.results.setText("處理中")
+        combined_url = f'{BASE_URL}/{os.getenv("DEVICE_NUM")}/{user_input}'
+
+        # Start network worker in a separate thread
+        self.worker = NetworkWorker(combined_url)
+        self.worker.result_ready.connect(self.handle_result)
+        self.worker.error_occurred.connect(self.handle_error)
+        self.worker.start()
+
+    def handle_result(self, response_text):
+        """Handle the response when the network request succeeds"""
+        if "老師 刷卡成功" in response_text:
+            name = response_text.split(' ')[0].replace("老師", "").replace('"', '')
+            if name == self.teacher:
+                self.teacher = ""
+            else:
+                self.teacher = f"老師: {name}\n\n"
+        self.results.setText(response_text.replace('"', ''))
+        QTimer.singleShot(3000, self.reset)
+
+    def handle_error(self, error_message):
+        """Handle errors in the network request"""
+        print(f"Error: {error_message}")
+        self.results.setText("刷卡失敗")
+        QTimer.singleShot(3000, self.reset)
 
     def reset(self):
+        """Resets the UI to initial state"""
+        self.results.setText("請刷卡或輸入卡號")
+        self.input.clear()
 
-        self.results.configure(text=self.teacher + "請刷卡或輸入卡號")
-        self.input.focus_set()
+    def delete_digit(self):
+        """Deletes a digit from the input field"""
+        current_text = self.input.text()
+        self.input.setText(current_text[:-1])
 
-    def check_id(self, event=None):
-        if self.input.get() == "10369601":
-            self.destroy()
-        print(self.input.get())
-        print(type(self.input.get()))
-        self.results.configure(text="處理中")
-        try:
-            combined_url = f'http://192.168.2.6:8001/{str(config["DEVICE_NUM"])}/{self.input.get()}'
-            print(f"code entered: {self.input.get()}")
-            r = requests.get(combined_url, timeout=5)
-            r.raise_for_status()
-            print(r.text)
-            if "老師 刷卡成功" in r.text:
-                name = r.text.split(' ')[0].replace("老師", "").replace('"', '')
-                if name == self.stored_teacher_name:
-                    print("same")
-                    self.teacher = self.stored_teacher_name = ""
-                else:
-                    self.stored_teacher_name = name
-                    self.teacher = "老師: " + name  + "\n\n"
-            self.results.configure(text=str(r.text).replace('"', ''))
-            self.input.delete(0, "end")
-            self.after(3000, self.reset)
+    def toggle_keyboard(self):
+        """Toggles the on-screen keyboard"""
+        if self.is_kb_open:
+            self.numpad_frame.hide()
+            self.results.show()
+            self.is_kb_open = False
+            self.open_btn.setText("開啟鍵盤")
+        else:
+            self.results.hide()
+            self.delete_btn.show()
+            self.confirm_btn.show()
+            self.numpad_frame.show()
+            self.is_kb_open = True
+            self.open_btn.setText("收起鍵盤")
 
-        except Exception as e:
-            print(f"Error: {e}")
-            self.results.configure(text="刷卡失敗")
-            self.input.delete(0, "end")
-            self.after(3000, self.reset)
+if __name__ == "__main__":
+    # Set up application and global font
+    app = QApplication(sys.argv)
+    app.setStyle("Material")
+    font_id = QFontDatabase.addApplicationFont(FONT_PATH)
+    font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+    font = QFont(font_family)
+    app.setFont(font)
 
-
-app = App()
-sv_ttk.set_theme("light")
-nametofont("SunValleyCaptionFont").configure(family='Sarasa Fixed TC', size=-18)
-nametofont("SunValleyCaptionFont").configure(family='Sarasa Fixed TC', size=-18)
-nametofont("SunValleyBodyFont").configure(family='Sarasa Fixed TC', size=-20)
-nametofont("SunValleyBodyStrongFont").configure(family='Sarasa Fixed TC', size=-18)
-nametofont("SunValleyBodyLargeFont").configure(family='Sarasa Fixed TC', size=-22)
-nametofont("SunValleySubtitleFont").configure(family='Sarasa Fixed TC', size=-22)
-nametofont("SunValleyTitleFont").configure(family='Sarasa Fixed TC', size=-32)
-nametofont("SunValleyTitleLargeFont").configure(family='Sarasa Fixed TC', size=-42)
-nametofont("SunValleyDisplayFont").configure(family='Sarasa Fixed TC', size=-72)
-app.mainloop()
+    window = App()
+    window.show()
+    sys.exit(app.exec())
