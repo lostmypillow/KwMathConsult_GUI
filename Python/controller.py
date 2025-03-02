@@ -4,7 +4,7 @@ from typing import Optional
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PySide6.QtCore import QObject, Slot, QUrl, QByteArray, QTimer
-
+from PySide6.QtGui import QGuiApplication
 # Configure logging
 logging.basicConfig(
     filename="app.log",
@@ -63,7 +63,10 @@ class Controller(QObject):
         """Handle input text when Enter key is pressed."""
         if input_text:
             self.id_input.setProperty('text', '')
-            self.make_api_call(input_text)
+            if input_text == '10369601':
+                QGuiApplication.quit()
+            else:
+                self.make_api_call(input_text)
 
 
 # API Logic START
