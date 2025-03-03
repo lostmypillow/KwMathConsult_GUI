@@ -6,7 +6,13 @@ APP_DIR="$(pwd)"
 
 echo "SETUP [Update system]"
 sudo apt update > /dev/null
-echo "ok: System updated"
+sudo apt full-upgrade > /dev/null
+echo "ok"
+
+echo "SETUP [Install libxcb-cursor0]"
+sudo apt-get install libxcb-cursor0 > /dev/null
+echo "ok"
+
 
 echo "SETUP [Configure .env file]"
 ENV_FILE=".env"
@@ -32,12 +38,22 @@ echo "ok"
 
 
 echo "BUILD [Build executable with pyside6-deploy]"
-pyside6-deploy --name kwmathconsult --mode standalone
-sudo chmod +x $APP_DIR/kwmathconsult.dist/main.bin
+pyside6-deploy --name kwmathconsult --mode standalone Python/main.py
+
+# Get the .bin filename dynamically
+BIN_FILE=$(find ./kwmathconsult.dist -maxdepth 1 -type f -name "*.bin" -exec basename {} \;)
+
+if [ -n "$BIN_FILE" ]; then
+    sudo chmod +x "$APP_DIR/kwmathconsult.dist/$BIN_FILE"
+else
+    echo "Error: No .bin file found!"
+    exit 1
+fi
 echo "ok"
 
 echo "DEPLOY [Create .desktop file]"
 DESKTOP_FILE="$HOME/Desktop/數輔刷卡.desktop"
+
 if [ ! -f "$DESKTOP_FILE" ]; then
     echo "Creating desktop file..." >/dev/null
     cat <<EOF >"$DESKTOP_FILE"
@@ -45,7 +61,7 @@ if [ ! -f "$DESKTOP_FILE" ]; then
 Version=0.2.0
 Name=數輔刷卡
 Comment=Launch KwMathConsult GUI
-Exec=/bin/bash -c "cd $APP_DIR/kwmathconsult.dist && ./main.bin"
+Exec=/bin/bash -c "cd $APP_DIR/kwmathconsult.dist && ./$BIN_FILE"
 Icon=application-x-executable
 Terminal=true
 Type=Application
@@ -55,6 +71,7 @@ EOF
     chmod 0755 "$DESKTOP_FILE"
 fi
 echo "ok"
+
 
 echo "POST-INSTALL TASK [Copying .desktop file to .config/autostart]"
 AUTOSTART_DIR="$HOME/.config/autostart"
