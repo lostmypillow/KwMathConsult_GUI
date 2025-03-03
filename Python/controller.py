@@ -111,7 +111,7 @@ class Controller(QObject):
             try:
                 response_json = QByteArray(response_data).data().decode(
                     "utf-8").replace('"', "")
-                logging.info("API Response:", response_json)
+                logging.info(f"API Response:{response_json}")
                 self.main_text.setProperty('text', response_json)
 
                 if "老師" in response_json:
