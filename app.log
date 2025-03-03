@@ -7,3 +7,7 @@
 2025-03-03 06:23:16,854 - INFO - PySide6.QtCore.QUrl('http://192.168.2.32:8001/1/123')
 2025-03-03 06:23:21,874 - INFO - Request timed out.
 2025-03-03 06:23:21,882 - ERROR - Error: Operation canceled, Code: NetworkError.OperationCanceledError
+2025-03-03 18:23:48,358 - INFO - PySide6.QtCore.QUrl('http://192.168.2.32:8001/1/200067')
+2025-03-03 18:25:26,327 - INFO - PySide6.QtCore.QUrl('http://192.168.2.32:8001/1/201350')
+2025-03-03 18:25:33,734 - INFO - PySide6.QtCore.QUrl('http://192.168.2.32:8001/1/200001')
+2025-03-03 18:25:43,302 - INFO - PySide6.QtCore.QUrl('http://192.168.2.32:8001/1/200067')
