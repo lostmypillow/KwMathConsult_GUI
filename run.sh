@@ -47,11 +47,15 @@ fi
 echo "ok"
 
 echo "DEPLOY [Create .desktop file]"
-DESKTOP_FILE="/home/kaowei/Desktop/數輔刷卡.desktop"
-rm -f "$DESKTOP_DIR"/*.desktop
-if [ ! -f "$DESKTOP_FILE" ]; then
-    echo "Creating desktop file..." >/dev/null
-    cat <<EOF >"$DESKTOP_FILE"
+DESKTOP_DIR="/home/kaowei/Desktop"
+DESKTOP_FILE="$DESKTOP_DIR/數輔刷卡.desktop"
+
+# Remove all .desktop files from the Desktop folder
+sudo rm -f "$DESKTOP_DIR"/*.desktop
+
+# Create or overwrite the .desktop file
+echo "Creating desktop file..." >/dev/null
+cat <<EOF >"$DESKTOP_FILE"
 [Desktop Entry]
 Version=0.2.4
 Name=數輔刷卡
@@ -63,9 +67,12 @@ Type=Application
 Categories=Utility;Application;
 StartupNotify=true
 EOF
-    chmod 0755 "$DESKTOP_FILE"
-fi
+
+# Set the appropriate permissions
+chmod 0755 "$DESKTOP_FILE"
+
 echo "ok"
+
 
 
 echo "POST-INSTALL TASK [Copying .desktop file to .config/autostart]"
@@ -74,9 +81,14 @@ if [ ! -d "$AUTOSTART_DIR" ]; then
     mkdir -p "$AUTOSTART_DIR"
     chmod 0755 "$AUTOSTART_DIR"
 fi
-rm -f "$AUTOSTART_DIR"/*.desktop
+sudo rm -f "$AUTOSTART_DIR"/*.desktop
 cp "$DESKTOP_FILE" "$AUTOSTART_DIR/數輔刷卡.desktop"
 chmod 0755 "$AUTOSTART_DIR/數輔刷卡.desktop"
+echo "ok"
+
+echo "POST-INSTALL TASK [Enable app.log permissions]"
+chown -R $(whoami) $(dirname app.log)
+chmod u+w $(dirname app.log)
 echo "ok"
 
 echo "POST-INSTALL TASK [Disable screen blanking via autostart]"
