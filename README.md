@@ -13,3 +13,5 @@ Improved API call (no longer freezes main loop)
 
 `pyside6-deploy --name kwmathconsult --mode standalone`
 `pyside6-rcc KwMathConsult_GUI.qrc -o Python/autogen/resources.py`
+
+Open file manager, then --> Edit--> Preferences --> General --> General : check option "Don't ask options on launch executable ...."

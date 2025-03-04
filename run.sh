@@ -6,7 +6,6 @@ APP_DIR="$(pwd)"
 
 echo "SETUP [Update system]"
 sudo apt update > /dev/null
-sudo apt full-upgrade > /dev/null
 echo "ok"
 
 echo "SETUP [Install libxcb-cursor0]"
@@ -16,14 +15,10 @@ echo "ok"
 
 echo "SETUP [Configure .env file]"
 ENV_FILE=".env"
-
-nano $ENV_FILE
-
-# Confirm the file was edited
-echo "SETUP [Review the env variables]:"
+echo "SETUP [Review the env variables, press Enter to continue or Ctrl+C to abort]:"
 cat $ENV_FILE
-echo "SETUP [Ensure these environment variables are correct before proceeding.]"
-read -p "Press Enter to continue or Ctrl+C to abort."
+echo ""
+read
 
 echo "SETUP [Ensure virtual environment is enabled]"
 if [ ! -d "$APP_DIR/.venv" ]; then
@@ -52,13 +47,13 @@ fi
 echo "ok"
 
 echo "DEPLOY [Create .desktop file]"
-DESKTOP_FILE="$HOME/Desktop/數輔刷卡.desktop"
-
+DESKTOP_FILE="/home/kaowei/Desktop/數輔刷卡.desktop"
+rm -f "$DESKTOP_DIR"/*.desktop
 if [ ! -f "$DESKTOP_FILE" ]; then
     echo "Creating desktop file..." >/dev/null
     cat <<EOF >"$DESKTOP_FILE"
 [Desktop Entry]
-Version=0.2.0
+Version=0.2.4
 Name=數輔刷卡
 Comment=Launch KwMathConsult GUI
 Exec=/bin/bash -c "cd $APP_DIR/kwmathconsult.dist && ./$BIN_FILE"
@@ -74,20 +69,21 @@ echo "ok"
 
 
 echo "POST-INSTALL TASK [Copying .desktop file to .config/autostart]"
-AUTOSTART_DIR="$HOME/.config/autostart"
+AUTOSTART_DIR="/home/kaowei/.config/autostart"
 if [ ! -d "$AUTOSTART_DIR" ]; then
     mkdir -p "$AUTOSTART_DIR"
     chmod 0755 "$AUTOSTART_DIR"
 fi
+rm -f "$AUTOSTART_DIR"/*.desktop
 cp "$DESKTOP_FILE" "$AUTOSTART_DIR/數輔刷卡.desktop"
 chmod 0755 "$AUTOSTART_DIR/數輔刷卡.desktop"
 echo "ok"
 
 echo "POST-INSTALL TASK [Disable screen blanking via autostart]"
 
-AUTOSTART_FILE="$HOME/.config/lxsession/LXDE-pi/autostart"
+AUTOSTART_FILE="/home/kaowei/.config/lxsession/LXDE-pi/autostart"
 if [ ! -f "$AUTOSTART_FILE" ]; then
-    mkdir -p "$HOME/.config/lxsession/LXDE-pi"
+    mkdir -p "/home/kaowei/.config/lxsession/LXDE-pi"
     touch "$AUTOSTART_FILE"
 fi
 

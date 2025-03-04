@@ -9,6 +9,7 @@ Window {
     height: mainScreen.height
 
     visible: true
+    visibility: FullScreen
     title: "KwMathConsult_GUI"
 
     
