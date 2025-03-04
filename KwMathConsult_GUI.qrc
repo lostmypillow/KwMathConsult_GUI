@@ -3,8 +3,6 @@
 <qresource>
 <file>KwMathConsult_GUI.qmlproject</file>
 <file>KwMathConsult_GUI/Constants.qml</file>
-<file>KwMathConsult_GUI/EventListModel.qml</file>
-<file>KwMathConsult_GUI/EventListSimulator.qml</file>
 <file>KwMathConsult_GUI/qmldir</file>
 <file>KwMathConsult_GUIContent/App.qml</file>
 <file>KwMathConsult_GUIContent/fonts/SarasaFixedTC-Regular.ttf</file>
