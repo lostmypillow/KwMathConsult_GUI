@@ -87,7 +87,7 @@ sudo chmod 0755 "$AUTOSTART_DIR/數輔刷卡.desktop"
 echo "ok"
 
 echo "POST-INSTALL TASK [Enable app.log permissions]"
-sudo chown -R $(whoami) $(dirname app.log)
+sudo chown -R kaowei $(dirname app.log)
 sudo chmod u+w $(dirname app.log)
 echo "ok"
 
