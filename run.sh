@@ -69,7 +69,7 @@ StartupNotify=true
 EOF
 
 # Set the appropriate permissions
-chmod 0755 "$DESKTOP_FILE"
+sudo chmod 0755 "$DESKTOP_FILE"
 
 echo "ok"
 
@@ -83,12 +83,12 @@ if [ ! -d "$AUTOSTART_DIR" ]; then
 fi
 sudo rm -f "$AUTOSTART_DIR"/*.desktop
 cp "$DESKTOP_FILE" "$AUTOSTART_DIR/數輔刷卡.desktop"
-chmod 0755 "$AUTOSTART_DIR/數輔刷卡.desktop"
+sudo chmod 0755 "$AUTOSTART_DIR/數輔刷卡.desktop"
 echo "ok"
 
 echo "POST-INSTALL TASK [Enable app.log permissions]"
-chown -R $(whoami) $(dirname app.log)
-chmod u+w $(dirname app.log)
+sudo chown -R $(whoami) $(dirname app.log)
+sudo chmod u+w $(dirname app.log)
 echo "ok"
 
 echo "POST-INSTALL TASK [Disable screen blanking via autostart]"
