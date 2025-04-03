@@ -1,0 +1,14 @@
+
+<RCC>
+<qresource>
+<file>KwMathConsult_GUI.qmlproject</file>
+<file>KwMathConsult_GUI/Constants.qml</file>
+<file>KwMathConsult_GUI/qmldir</file>
+<file>KwMathConsult_GUIContent/App.qml</file>
+<file>KwMathConsult_GUIContent/fonts/SarasaFixedTC-Regular.ttf</file>
+<file>KwMathConsult_GUIContent/images/kb.png</file>
+<file>KwMathConsult_GUIContent/Screen01.ui.qml</file>
+<file>Python/qtquickcontrols2.conf</file>
+<file>qtquickcontrols2.conf</file>
+</qresource>
+</RCC>
